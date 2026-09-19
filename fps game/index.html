@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D FPS 射击游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="crosshair">
+            <div class="crosshair-line crosshair-h"></div>
+            <div class="crosshair-line crosshair-v"></div>
+            <div class="crosshair-dot"></div>
+        </div>
+        
+        <div id="hitMarker"></div>
+        <div id="reloadBar"><div id="reloadFill"></div></div>
+        
+        <div id="hud">
+            <div id="healthBar">
+                <div class="hud-label">生命值</div>
+                <div class="bar-container">
+                    <div id="healthFill" class="bar-fill health-fill"></div>
+                </div>
+                <div id="healthText">100 / 100</div>
+            </div>
+            
+            <div id="centerStats">
+                <div id="ammoInfo">
+                    <div class="hud-label">弹药</div>
+                    <div id="ammoText">12 / 48</div>
+                </div>
+                <div id="weaponInfo">
+                    <div class="hud-label">武器</div>
+                    <div id="weaponName">手枪</div>
+                </div>
+            </div>
+            
+            <div id="rightStats">
+                <div id="scoreInfo">
+                    <div class="hud-label">得分</div>
+                    <div id="scoreText">0</div>
+                </div>
+                <div id="killsInfo">
+                    <div class="hud-label">击杀</div>
+                    <div id="killsText">0</div>
+                </div>
+                <div id="waveInfo">
+                    <div class="hud-label">波次</div>
+                    <div id="waveText">1</div>
+                </div>
+                <div id="comboInfo" class="hud-section hidden">
+                    <div class="hud-label">连击</div>
+                    <div id="comboText">x1</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="weaponSlots">
+            <div class="weapon-slot active" data-slot="1">
+                <span class="slot-key">1</span>
+                <span class="slot-name">手枪</span>
+            </div>
+            <div class="weapon-slot" data-slot="2">
+                <span class="slot-key">2</span>
+                <span class="slot-name">冲锋枪</span>
+            </div>
+            <div class="weapon-slot" data-slot="3">
+                <span class="slot-key">3</span>
+                <span class="slot-name">步枪</span>
+            </div>
+            <div class="weapon-slot" data-slot="4">
+                <span class="slot-key">4</span>
+                <span class="slot-name">霰弹枪</span>
+            </div>
+            <div class="weapon-slot" data-slot="5">
+                <span class="slot-key">5</span>
+                <span class="slot-name">火箭筒</span>
+            </div>
+        </div>
+        
+        <div id="skillsBar">
+            <div class="skill-slot" id="skillBulletTime">
+                <span class="slot-key">Q</span>
+                <div class="skill-cd-overlay"><div id="skillCdFill"></div></div>
+            </div>
+            <div class="skill-slot" id="skillMelee">
+                <span class="slot-key">V</span>
+                <div class="skill-cd-overlay"><div id="skillCdFill2"></div></div>
+            </div>
+        </div>
+        
+        <div id="fpsCounter">60 FPS</div>
+        <div id="damageOverlay"></div>
+        <div class="muzzle-flash" id="muzzleFlash"></div>
+        <div id="slowmoOverlay"></div>
+        <div id="comboDisplay" class="hidden"></div>
+        <div id="impactFlash"></div>
+        
+        <div id="startScreen" class="overlay">
+            <h1 class="game-title">3D FPS 射击游戏</h1>
+            <div class="game-desc">
+                <p>消灭所有怪物，生存下去！支持爆头、跳箱与队友协同。</p>
+            </div>
+            <div class="controls-info">
+                <h3>操作说明</h3>
+                <ul>
+                    <li><strong>WASD</strong> - 移动</li>
+                    <li><strong>鼠标</strong> - 视角控制</li>
+                    <li><strong>左键</strong> - 射击</li>
+                    <li><strong>滚轮 / 1-5</strong> - 切换武器</li>
+                    <li><strong>R</strong> - 换弹</li>
+                    <li><strong>空格</strong> - 跳跃（可空中再跳一次）</li>
+                    <li><strong>Shift</strong> - 冲刺</li>
+                    <li><strong>Q</strong> - 子弹时间（慢动作）</li>
+                    <li><strong>V</strong> - 枪托近战</li>
+                    <li><strong>Esc</strong> - 暂停</li>
+                </ul>
+            </div>
+            <div class="skin-selector">
+                <h3>选择皮肤</h3>
+                <div class="skin-options">
+                    <div class="skin-option active" data-skin="default">
+                        <div class="skin-preview skin-default"></div>
+                        <span>默认</span>
+                    </div>
+                    <div class="skin-option" data-skin="desert">
+                        <div class="skin-preview skin-desert"></div>
+                        <span>沙漠</span>
+                    </div>
+                    <div class="skin-option" data-skin="forest">
+                        <div class="skin-preview skin-forest"></div>
+                        <span>丛林</span>
+                    </div>
+                    <div class="skin-option" data-skin="urban">
+                        <div class="skin-preview skin-urban"></div>
+                        <span>都市</span>
+                    </div>
+                </div>
+            </div>
+            <button id="startButton">开始游戏</button>
+        </div>
+        
+        <div id="gameOverScreen" class="overlay hidden">
+            <h1 class="game-over-title">游戏结束</h1>
+            <div id="finalStats">
+                <p>最终得分: <span id="finalScore">0</span></p>
+                <p>击杀数: <span id="finalKills">0</span></p>
+                <p>存活波次: <span id="finalWave">1</span></p>
+                <p>最高连击: <span id="finalCombo">0</span></p>
+            </div>
+            <button id="restartButton">重新开始</button>
+        </div>
+        
+        <div id="pauseScreen" class="overlay hidden">
+            <h1 class="pause-title">游戏暂停</h1>
+            <button id="resumeButton">继续游戏</button>
+            <button id="quitButton">返回主菜单</button>
+        </div>
+        
+        <div id="messageBox"></div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="src/core/Config.js"></script>
+    <script src="src/core/EventBus.js"></script>
+    <script src="src/core/DamageCalculator.js"></script>
+    <script src="src/core/ObjectPool.js"></script>
+    <script src="src/core/GameSystems.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
